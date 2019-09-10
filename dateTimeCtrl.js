@@ -5,8 +5,13 @@
   eventually, give option to pick another month/year when date value is 
   blank other than the Current month/year as a starting point on the calendar.
   
-  Developer: Orville Paul Chomer
-  
+  Developer:                Orville Paul Chomer
+  Twitter:                  @orvilleChomer
+  Glitch Profile:           https://glitch.com/@OrvilleChomer
+  CodePen Profile:          https://codepen.io/orvilleChomer
+  Web Site:                 http://chomer.com
+  Github:                   https://github.com/OrvilleChomer
+  Project Github Repo:      https://github.com/OrvilleChomer/dateTimeCtrl
   
  ****************************************************************************/
 
@@ -1238,9 +1243,4 @@ const gblDateCtrlState = {};
     
     
   } // end of function DateTimeCtrl()
-
-// #####################################################################################
-// #####################################################################################
-// #####################################################################################
-
 
