@@ -945,11 +945,13 @@ const gblDateCtrlState = {};
         return; // already there, no need to add
       } // end if
       
+      const sFont = '  font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;';
       
       s.push("#calAmPmSelect {");
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
       s.push("  top:3px;");
+      s.push(sFont);
       s.push("  left:225px;");
       s.push("  font-size:12pt;");
       s.push("  height:30px;");
@@ -961,6 +963,7 @@ const gblDateCtrlState = {};
       s.push("  box-sizing:border-box;");
       s.push("  top:9px;");
       s.push("  left:126px;");
+      s.push(sFont);
       s.push("  font-size:16pt;");
       s.push("  background:white;");
       s.push("}");
@@ -971,6 +974,7 @@ const gblDateCtrlState = {};
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
+      s.push(sFont);
       s.push("  background:white;");
       s.push("}");
 
@@ -979,6 +983,7 @@ const gblDateCtrlState = {};
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
+      s.push(sFont);
       s.push("  background:#f2f2f2;");
       s.push("}");
       
@@ -1021,6 +1026,7 @@ const gblDateCtrlState = {};
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
+      s.push(sFont);
       s.push("  background:#ffd9b3;");
       s.push("}");
 
@@ -1030,6 +1036,7 @@ const gblDateCtrlState = {};
       s.push("  overflow:hidden;");
       s.push("  height:35px;");
       s.push("  top:6px;");
+      s.push(sFont);
       s.push("  cursor:pointer;");
       s.push("}");
 
@@ -1040,6 +1047,7 @@ const gblDateCtrlState = {};
       s.push("  left:20px;");
       s.push("  top:8px;");
       s.push("  width: 300px;");
+      s.push(sFont);
       s.push("  font-size:24pt;");
       s.push("  color:#0066cc;");
       s.push("}"); 
@@ -1062,6 +1070,7 @@ const gblDateCtrlState = {};
       s.push("  top:3px;");
       s.push("  width: 120px;");
       s.push("  text-align:center;");
+      s.push(sFont);
       s.push("  font-size:12pt;");
       s.push("}"); 
       
@@ -1080,6 +1089,7 @@ const gblDateCtrlState = {};
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
       s.push("  text-align:center;");
+      s.push(sFont);
       s.push("  left:148px;");
       s.push("  top:3px;");
       s.push("  width: 32px;");
@@ -1096,6 +1106,7 @@ const gblDateCtrlState = {};
       s.push("  top:45px;");
       s.push("  right:48px;");
       s.push("  width:35px;");
+      s.push(sFont);
       s.push("  font-size:16pt;");
       s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
@@ -1110,6 +1121,7 @@ const gblDateCtrlState = {};
       s.push("  top:3px;");
       s.push("  left:187px;");
       s.push("  width:32px;");
+      s.push(sFont);
       s.push("  border-radius:5px;");
       s.push("  border:solid silver 1px;");
       s.push("}"); 
@@ -1117,6 +1129,7 @@ const gblDateCtrlState = {};
       
       s.push(".calMonthName {"); 
       s.push("  font-weight:bold;"); 
+      s.push(sFont);
       s.push("  font-size:24pt;"); 
       s.push("}"); 
 
@@ -1125,6 +1138,7 @@ const gblDateCtrlState = {};
       s.push("  left:20px;"); 
       s.push("  top:50px;"); 
       s.push("  width: 300px;"); 
+      s.push(sFont);
       s.push("}"); 
       
       s.push(".calOtherDays {");
@@ -1133,6 +1147,7 @@ const gblDateCtrlState = {};
       s.push("  overflow:hidden;");
       s.push("  text-align:center;");
       s.push("  line-height:30px;");
+      s.push(sFont);
       s.push("}");
       
       
@@ -1155,6 +1170,7 @@ const gblDateCtrlState = {};
       s.push("  box-sizing:border-box;");
       s.push("  overflow:hidden;");
       s.push("  height:35px;");
+      s.push(sFont);
       s.push("  top:45px;");
       s.push("  right:162px;");
       s.push("  width:35px;");
@@ -1172,6 +1188,7 @@ const gblDateCtrlState = {};
       s.push("  height:30px;");
       s.push("  border-radius:50%;");
       s.push("  font-weight:bold;");
+      s.push(sFont);
       s.push("  color:white;");
       s.push("  text-align:center;");
       s.push("  line-height:30px;");
@@ -1190,6 +1207,7 @@ const gblDateCtrlState = {};
       s.push("  height:35px;");
       s.push("  border-radius:3px;");
       s.push("  border:solid gray 1px;");
+      s.push(sFont);
       s.push("  font-size:16pt;");
       s.push("}"); 
       
@@ -1201,6 +1219,7 @@ const gblDateCtrlState = {};
       s.push("  top:45px;");
       s.push("  right:85px;");
       s.push("  width:75px;");
+      s.push(sFont);
       s.push("  font-size:16pt;");
       s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
@@ -1228,6 +1247,7 @@ const gblDateCtrlState = {};
       
 
       s.push(".calYear {");
+      s.push(sFont);
       s.push("  font-size:24pt;");
       s.push("}");
 
@@ -1246,6 +1266,7 @@ const gblDateCtrlState = {};
       //background: linear-gradient(to bottom, #808080, #3fada8);
       s.push("  background: linear-gradient(to bottom, #dc9589 0%, #a64231 49%, #973c2d 50%, #e97f3f 94%, #dfbb58 100%);");
       s.push("  padding:0px;");
+      s.push(sFont);
       s.push("  font-size:20pt;");
       s.push("  line-height:20px;");
       s.push("  cursor:pointer;");
@@ -1257,7 +1278,9 @@ const gblDateCtrlState = {};
       s.push("  left:0px;");
       s.push("  top:0px;");
       s.push("  width:160px;");
+      s.push("  height:28px;");
       s.push("  font-size:10pt;");
+      s.push(sFont);
       s.push("  border-radius:5px 0px 0px 5px;");
       s.push("  margin-right:0px;");
       s.push("  margin-top:2px;");
