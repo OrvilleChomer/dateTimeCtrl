@@ -1059,6 +1059,7 @@ const gblDateCtrlState = {};
       s.push("  left:180px;");
       s.push("  top:6px;");
       s.push("  width: 300px;");
+      s.push(sFont);    
       s.push("  font-size:16pt;");
       s.push("}"); 
       
@@ -1231,6 +1232,7 @@ const gblDateCtrlState = {};
       s.push(".calWeekday {");
       s.push("  position:absolute;");
       s.push("  text-align:right;");
+      s.push(sFont);    
       s.push("}");
       
       
@@ -1282,9 +1284,9 @@ const gblDateCtrlState = {};
       s.push("  background:lightgreen;");
       s.push("  height:28px;");
       s.push("  font-size:10pt;");
-      s.push(sFont);
-      s.push("  border:solid gray 1px;");
+      s.push(sFont);      
       s.push("  border-radius:5px 0px 0px 5px;");
+      s.push("  border:solid gray 1px;");
       s.push("  margin-right:0px;");
       s.push("  margin-top:2px;");
       s.push("}");
