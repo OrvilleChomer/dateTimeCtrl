@@ -586,8 +586,8 @@ const gblDateCtrlState = {};
       ****************************************************************************/
       nTop = nTop + 10;    
       
-      if (nTop + 50 > nPageHeight) {
-        nPageHeight = nTop + 50;
+      if (nTop + 100 > nPageHeight) {
+        nPageHeight = nTop + 100;
       } // end if
       
       s.push("<div id='calDateTimeBox' ");
