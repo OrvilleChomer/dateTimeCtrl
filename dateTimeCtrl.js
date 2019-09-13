@@ -1275,6 +1275,7 @@ const gblDateCtrlState = {};
       // used for calendar control on input form:
       s.push(".dateTime {");
       s.push("  position:absolute;");
+      s.push("  box-sizing:border-box;");
       s.push("  left:0px;");
       s.push("  top:0px;");
       s.push("  width:160px;");
@@ -1289,7 +1290,8 @@ const gblDateCtrlState = {};
       s.push(".dateTimeButton {");
       s.push("  position:absolute;");
       s.push("  overflow:hidden;");
-      s.push("  left:160px;");
+      s.push("  box-sizing:border-box;");
+      s.push("  left:159px;");
       s.push("  top:0px;");
       s.push("  width:120px;");
       s.push("  background:#f2f2f2;");
