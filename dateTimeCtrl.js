@@ -1,10 +1,11 @@
-/****************************************************************************
+/*****************************************************************************************************************
 
   dateTimeCtrl.js
   
   eventually, give option to pick another month/year when date value is 
   blank other than the Current month/year as a starting point on the calendar.
   
+  Created:                  August/September 2019
   Developer:                Orville Paul Chomer
   Twitter:                  @orvilleChomer
   Glitch Profile:           https://glitch.com/@OrvilleChomer
@@ -13,7 +14,27 @@
   Github:                   https://github.com/OrvilleChomer
   Project Github Repo:      https://github.com/OrvilleChomer/dateTimeCtrl
   
- ****************************************************************************/
+  Add the following line at the top of your JavaScript file that is going to
+  use this module (this will use Github as a CDN):
+  
+     import DateTimeCtrl from 'https://orvillechomer.github.io/dateTimeCtrl/dateTimeCtrl.js'
+     
+  For more information on how to use this date/time control in your code go to:
+  
+     https://github.com/OrvilleChomer/dateTimeCtrl
+     
+     check out the:   README.md     file
+     
+     
+  Page on my site about this date control: 
+  
+     http://chomer.com/freeware/javascript-module-date-time-control-info/
+  
+  
+  Try this test page out on Glitch:    https://respected-indigo.glitch.me/
+
+       Generating date control on this page is not automatic just to make my debugging of the control easier!
+ ****************************************************************************************************************/
 
 const gblDateCtrlInfoByFieldName = [];
 const gblDateCtrlInfoByIndex = [];
@@ -21,11 +42,15 @@ const gblDateCtrlState = {};
 
 
  /****************************************************************************
+  returns my lame attempt at a singleton in JavaScript! :P
   ****************************************************************************/
   export default function DateTimeCtrl() {
     console.log("DateTimeCtrl constructor called");
     const dtCtrl = this;
     const Q = '"';
+    const dateTimeCtrlVersion = "1.0";
+    
+    dtCtrl.ctrlVersion = dateTimeCtrlVersion;
     
     const cssSelectors = {};
     defineCssSelectors();
@@ -77,7 +102,7 @@ const gblDateCtrlState = {};
         s.push(Q);
         s.push(">");
       
-        // elipses button...
+        // elipsis button...
         s.push("<button ");
         s.push("data-field="+Q+ctrl.field+Q+" ");
         s.push("class='dateTimeButton' ");
@@ -107,7 +132,7 @@ const gblDateCtrlState = {};
         const dateTimeNd = document.getElementById("frmItm"+ctrl.field+"_vw");
         const dateTimeButtonNd = document.getElementById("frmItm"+ctrl.field+"_btn");
         
-        dateTimeButtonNd.addEventListener('click', dtCtrl.calendarPopupClicked); // capture elipses button being clicked
+        dateTimeButtonNd.addEventListener('click', dtCtrl.calendarPopupClicked); // capture elipsis button being clicked
         
         // ok, we are doing a little bit More than attaching events... :)
         ctrl.hiddenInput = hiddenNd;
@@ -139,6 +164,8 @@ const gblDateCtrlState = {};
       } // end if
       
       ctrl.pickDate.setMonth(nMonth);
+      
+      savePendingSelTime(ctrl);
       
       buildCalendarPopup(ctrl);
     } // end of calPrev()
@@ -197,6 +224,8 @@ const gblDateCtrlState = {};
       
       ctrl.pickDate.setMonth(nMonth);
       
+      savePendingSelTime(ctrl);
+      
       buildCalendarPopup(ctrl);
     } // end of calNext()
     
@@ -211,6 +240,12 @@ const gblDateCtrlState = {};
       const btn = event.target;
       const sField = btn.dataset.field;
       const ctrl = gblDateCtrlInfoByFieldName[sField];
+      const sMsg = [];
+      
+      if (!ctrl.pendingSelDatePicked && ctrl.dateValue !== "") {
+        const selDate = new Date(ctrl.dateValue);
+        ctrl.pendingSelDate = selDate;
+      } // end if
       
       if (ctrl.pendingSelDatePicked) {
         const selDate = new Date();
@@ -218,8 +253,40 @@ const gblDateCtrlState = {};
         selDate.setMonth(pendingSelDate.getMonth());
         selDate.setDate(pendingSelDate.getDate());
         selDate.setFullYear(pendingSelDate.getFullYear());
-        selDate.setHours(pendingSelDate.getHours());
-        selDate.setMinutes(pendingSelDate.getMinutes());
+        
+        if (ctrl.editTime === true) {
+          const calHourEntryNd = document.getElementById("calHourEntry");
+          const calMinuteEntryNd = document.getElementById("calMinuteEntry");
+          const calAmPmSelectNd = document.getElementById("calAmPmSelect");
+          
+          let nHours = calHourEntryNd.value - 0;
+          let nMinutes = calMinuteEntryNd.value - 0;
+          const sAMPM = calAmPmSelectNd.value;
+          
+          if (nHours < 1 || nHours > 12) {
+            sMsg.push("Invalid hour value. (Needs to be between 1 and 12)");
+          } // end if
+          
+          if (nMinutes < 0 || nMinutes > 59) {
+            sMsg.push("Invalid minute value. (Needs to be between 00 and 59)");
+          } // end if
+          
+          if (sAMPM === "PM") {
+            nHours = nHours + 12; // convert 12 hour time into 24 hour time that date variable uses
+          } // end if
+          
+          nHours = nHours - 1; // since a date variable has hours as base 0 though visually it is base 1!
+          selDate.setHours(nHours);
+          selDate.setMinutes(nMinutes);
+        } // end if
+        
+        if (sMsg.length > 0) {
+          sMsg.push("");
+          sMsg.push("SET Canceled");
+          alert(sMsg.join("\n"));
+          return;
+        } // end if
+        
         ctrl.selDate = selDate;
         ctrl.dateValue = selDate + ""; // date value cast as a string
         ctrl.pendingSelDate = undefined;
@@ -251,6 +318,8 @@ const gblDateCtrlState = {};
       ctrl.pickDate.setMonth(todaysDate.getMonth());
       ctrl.pickDate.setDate(todaysDate.getDate());
       ctrl.pickDate.setFullYear(todaysDate.getFullYear());
+      savePendingSelTime(ctrl);
+      
       buildCalendarPopup(ctrl);
     } // end of calToday()
         
@@ -285,7 +354,7 @@ const gblDateCtrlState = {};
       let sCaption = "Select Date";
       let pickDate = ctrl.pickDate; // where we are pointing and poking around!  :P
       let todaysDate = new Date();
-      
+      let bFoundSelDate = false;
       
       
       
@@ -410,15 +479,32 @@ const gblDateCtrlState = {};
           if (weekDate===0 || weekDate > nTotDaysInMonth) {
             sClass = "calBlockEmpty";
           } else {
-            // was the date previously selected...
+            // was the date previously selected and Set...
             if (ctrl.hasValue) {
               // and does the selected date match the current date block?
               if (ctrl.selMonth === pickDate.getMonth() &&
                   ctrl.selDate === weekDate &&
                   ctrl.selYear === pickDate.getFullYear()) {
                 sClass = "calBlockSel calDateBlock";
+                bFoundSelDate = true;
               } // end if
             } // end if (hasValue)
+            
+            if (!bFoundSelDate) {
+              // was the date previously selected while the popup was still up...
+              // (user navigated to different month or pressed the [Today] button)
+              
+              if (ctrl.pendingSelDatePicked) {
+                if (ctrl.pendingSelMonth === pickDate.getMonth() &&
+                    ctrl.pendingSelDateNum === weekDate &&
+                    ctrl.pendingSelYear === pickDate.getFullYear()) {
+                  sClass = "calBlockSel calDateBlock";
+                  bFoundSelDate = true;
+                } // end if
+              } // end if (ctrl.pendingSelDatePicked)
+              
+            } // end if (!bFoundSelDate) 
+            
           } // end if
           
           s.push("<div class='"+sClass+"' ");
@@ -499,6 +585,11 @@ const gblDateCtrlState = {};
           and hide the calendar popup
       ****************************************************************************/
       nTop = nTop + 10;    
+      
+      if (nTop + 50 > nPageHeight) {
+        nPageHeight = nTop + 50;
+      } // end if
+      
       s.push("<div id='calDateTimeBox' ");
       s.push("style="+Q);
       s.push("top:"+(nTop)+"px;");
@@ -509,39 +600,44 @@ const gblDateCtrlState = {};
         s.push("<input id='calDateDsp' value='' readonly ");
         s.push(">");
         
-        s.push("<span class='calAt' ");
-        s.push(">@</span>");
+        if (ctrl.editTime === true) {
+          s.push("<span class='calAt' ");
+          s.push(">@</span>");
+
+          let nHours = pickDate.getHours()+1;
+          let sAMSelected = " selected";
+          let sPMSelected = "";
+          let sMinutes = pickDate.getMinutes()+"";
+
+          if (sMinutes.length === 1) {
+            sMinutes = "0"+sMinutes;
+          } // end if
+
+          if (nHours > 12) {
+            nHours = nHours - 12;
+            sAMSelected = "";
+            sPMSelected = " selected";
+          } // end if
+          
+          
+
+          s.push("<input id='calHourEntry' value='"+(nHours)+"' maxlength='2' ");
+          s.push(">");
+
+          s.push("<span class='calColonSep' ");
+          s.push(">:</span>");
+
+          s.push("<input id='calMinuteEntry' value='"+sMinutes+"' maxlength='2' ");
+          s.push(">");
+
+          s.push("<select id='calAmPmSelect' ");
+          s.push(">");
+            s.push("<option value='AM'"+sAMSelected+">AM</option>");
+            s.push("<option value='PM'"+sPMSelected+">PM</option>");
+          s.push("</select>");
+        } // end if (ctrl.editTime === true)
       
-        let nHours = pickDate.getHours()+1;
-        let sAMSelected = " selected";
-        let sPMSelected = "";
-        let sMinutes = pickDate.getMinutes()+"";
-      
-        if (sMinutes.length === 1) {
-          sMinutes = "0"+sMinutes;
-        } // end if
-      
-        if (nHours > 12) {
-          nHours = nHours - 12;
-          sAMSelected = "";
-          sPMSelected = " selected";
-        } // end if
-      
-        s.push("<input id='calHourEntry' value='"+(nHours)+"' maxlength='2' ");
-        s.push(">");
-      
-        s.push("<span class='calColonSep' ");
-        s.push(">:</span>");
-      
-        s.push("<input id='calMinuteEntry' value='"+sMinutes+"' maxlength='2' ");
-        s.push(">");
-      
-        s.push("<select id='calAmPmSelect' ");
-        s.push(">");
-          s.push("<option value='AM'"+sAMSelected+">AM</option>");
-          s.push("<option value='PM'"+sPMSelected+">PM</option>");
-        s.push("</select>");
-      
+        // SET button should be there... even if user is not editing the time value!
         s.push("<button id='calSetDateBtn' ");
         s.push("data-field="+Q+ctrl.field+Q+" ");
         s.push(">SET</button>");
@@ -579,8 +675,34 @@ const gblDateCtrlState = {};
         calDateDspNd.value = sDate;
       } // end if (ctrl.hasValue)
       
+      if (ctrl.pendingSelDatePicked) {
+        // override prev selected date if something has been picked this popup session
+        let calDateDspNd = document.getElementById("calDateDsp");
+        const sDate = formattedDate(ctrl.pendingSelDate);
+        calDateDspNd.value = sDate;
+        
+        const calHourEntryNd = document.getElementById("calHourEntry");
+        const calMinuteEntryNd = document.getElementById("calMinuteEntry");
+        const calAmPmSelectNd = document.getElementById("calAmPmSelect");
+      
+        calHourEntryNd.value = ctrl.pendingSelHour;
+        calHourEntryNd.value = ctrl.pendingSelMinute;
+        calHourEntryNd.value = ctrl.pendingSelAmPm;
+      } // end if
+      
       calPopupNd.style.display = "block";
       
+      const calDateTimeBoxNd = document.getElementById("calDateTimeBox");
+      calDateTimeBoxNd.style.display = "none";
+      
+      if (ctrl.dateValue !== "" || ctrl.pendingSelDate) {
+        calDateTimeBoxNd.style.display = "block";
+      } else {
+        if (ctrl.editTime === false) {
+          calDateTimeBoxNd.style.display = "block";
+        } // end if
+        
+      } // end if/else
       
       
       // attach event handlers to controls on the calendar popup:
@@ -590,11 +712,17 @@ const gblDateCtrlState = {};
       const calPopupTodayBtnNd = document.getElementById("calPopupTodayBtn");
       const calPopupNextBtnNd = document.getElementById("calPopupNextBtn");
       const calSetDateBtnNd = document.getElementById("calSetDateBtn");
+      const calHourEntryNd = document.getElementById("calHourEntry");
+      const calMinuteEntryNd = document.getElementById("calMinuteEntry");
+      
       calPopupCloseBtnNd.addEventListener('click', hideCalendarCtl);
       calPopupPrevBtnNd.addEventListener('click', dtCtrl.calPrev);
       calPopupTodayBtnNd.addEventListener('click', dtCtrl.calToday);
       calPopupNextBtnNd.addEventListener('click', dtCtrl.calNext);
       calSetDateBtnNd.addEventListener('click', dtCtrl.calSetDateTime);
+      calHourEntryNd.addEventListener('keydown', checkHourMinuteInput);
+      calMinuteEntryNd.addEventListener('keydown', checkHourMinuteInput);
+      
       
       const calDateBlocks = document.getElementsByClassName("calDateBlock");
       const nMax = calDateBlocks.length;
@@ -631,7 +759,7 @@ const gblDateCtrlState = {};
 
  /****************************************************************************
   Private function
-  User clicked on date block for a date...
+  User clicked on date block for a date on the calendar...
   ****************************************************************************/
   function calSelDate(event) {
     
@@ -664,20 +792,25 @@ const gblDateCtrlState = {};
     const ctrl = dtCtrl.getCtrl(sField);
     const pendingSelDate = new Date();
     const pickDate = ctrl.pickDate;
-    pendingSelDate.setMonth(pickDate.getMonth());
+    pendingSelDate.setMonth(nMonth);
     pendingSelDate.setDate(nDate);
-    pendingSelDate.setFullYear(pickDate.getFullYear());
+    pendingSelDate.setFullYear(nYear);
     pendingSelDate.setHours(pickDate.getHours());
     pendingSelDate.setMinutes(pickDate.getMinutes());
     ctrl.pendingSelDate = pendingSelDate;
     ctrl.pendingSelDatePicked = true;
+    
+    ctrl.pendingSelMonth = nMonth;
+    ctrl.pendingSelDateNum = nDate; // added Num so as to not wipe out the date value of the 'pendingSelDate' property!
+    ctrl.pendingSelYear = nYear;
+    
     dateBlock.className = "calBlockSel calDateBlock"; // show the date the user picked with a selection highlight color
 
     calDateDspNd.value = formattedDate(pendingSelDate); // show the date picked in a formatted manner
     
-  //  ctrl.hasValue = true;
-  //  ctrl.dateValue = selDate+"";
-  //  ctrl.hiddenInput.value = ctrl.dateValue;
+    // once a date has been selected, uhide area where user can put in a time and/or click SET button:
+    const calDateTimeBoxNd = document.getElementById("calDateTimeBox");
+    calDateTimeBoxNd.style.display = "block";
         
   } // end of function calSelDate()
     
@@ -686,6 +819,34 @@ const gblDateCtrlState = {};
     
   /****************************************************************************
       Private function
+      Will not allow the entry of non-integer characters into text box
+      has to be captured by "keydown" event... "keyup" will not work 
+      since by then it is too late!
+    ****************************************************************************/         
+    function checkHourMinuteInput(event) {
+      const kc = event.keyCode;
+      const BACKSPACE = 8; // don't have to worry about the Tab key!
+      
+      const sChar = String.fromCharCode(kc);
+      const sValidChars = "0123456789";
+      
+      if (sValidChars.indexOf(sChar) === -1 && kc !== BACKSPACE) {
+        // not a correct character... don't allow it to be accepted as part of the input!
+        event.stopPropagation();
+        event.preventDefault();  
+        event.returnValue = false;
+        event.cancelBubble = true;
+        return false;
+      } // end if
+      
+    } // end of function  checkHourMinuteInput()
+    
+    
+    
+    
+  /****************************************************************************
+      Private function
+      I've got to think this through some more!
     ****************************************************************************/     
     function defineCssSelectors() {
       cssSelectors["#calAmPmSelect"] = "calAmPmSelect";
@@ -788,9 +949,10 @@ const gblDateCtrlState = {};
       s.push("#calAmPmSelect {");
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
-      s.push("  top:9px;");
+      s.push("  top:3px;");
       s.push("  left:225px;");
-      s.push("  font-size:18pt;");
+      s.push("  font-size:12pt;");
+      s.push("  height:30px;");
       s.push("}");
       
       s.push(".calAt {");
@@ -820,14 +982,14 @@ const gblDateCtrlState = {};
       s.push("  background:#f2f2f2;");
       s.push("}");
       
-      s.push(".calBlockSel {");
+     /* s.push(".calBlockSel {");
       s.push("  position:absolute;");
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
-      s.push("  background:#0099cc;");
+      s.push("  background:#0099cc;");      
       s.push("}");
-      
+      */
 
       s.push(".calBlock1:hover {");
       s.push("  background:#e6e6ff;");
@@ -840,7 +1002,8 @@ const gblDateCtrlState = {};
       s.push("}");
       
       s.push(".calBlockSel:hover {");      
-      s.push("  background:lightyellow;");
+      s.push("  background:#0099cc;"); // lightyellow
+      s.push("  background: linear-gradient(to bottom, #ffd9b3 0%, #e6e6ff 90%);");
       s.push("  cursor:pointer;");
       s.push("}");      
       
@@ -854,6 +1017,10 @@ const gblDateCtrlState = {};
       
 
       s.push(".calBlockSel {");
+      s.push("  position:absolute;");
+      s.push("  overflow:hidden;");
+      s.push("  box-sizing:border-box;");
+      s.push("  border:solid silver .5px;");
       s.push("  background:#ffd9b3;");
       s.push("}");
 
@@ -930,6 +1097,7 @@ const gblDateCtrlState = {};
       s.push("  right:48px;");
       s.push("  width:35px;");
       s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
       s.push("  border:solid gray 1px;");
       s.push("  cursor:pointer;");
@@ -981,6 +1149,7 @@ const gblDateCtrlState = {};
       s.push("  border-radius:6px;");
       s.push("}");
 
+      
       s.push(".calPrevBtn {"); 
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
@@ -990,6 +1159,7 @@ const gblDateCtrlState = {};
       s.push("  right:162px;");
       s.push("  width:35px;");
       s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
       s.push("  border:solid gray 1px;");
       s.push("  cursor:pointer;");
@@ -1032,6 +1202,7 @@ const gblDateCtrlState = {};
       s.push("  right:85px;");
       s.push("  width:75px;");
       s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
       s.push("  border:solid gray 1px;");
       s.push("  cursor:pointer;");
@@ -1098,6 +1269,7 @@ const gblDateCtrlState = {};
       s.push("  left:160px;");
       s.push("  top:0px;");
       s.push("  width:120px;");
+      s.push("  background:#f2f2f2;");
       s.push("  border:solid gray 1px;");
       s.push("  border-radius:0px 5px 5px 0px;");
       s.push("  margin-left:0px;");
@@ -1191,6 +1363,29 @@ const gblDateCtrlState = {};
       tintNd.style.display = "none";
     } // end if
   } // end of function hideCalendarCtl()    
+    
+    
+    
+    
+   /****************************************************************************
+      Private function
+      called before redrawing popup as user moves from month to month...
+    ****************************************************************************/    
+    function savePendingSelTime(ctrl) {
+      if (!ctrl.pendingSelDatePicked) {
+        return; // no changes to possibly save
+      } // end if
+      
+      const calHourEntryNd = document.getElementById("calHourEntry");
+      const calMinuteEntryNd = document.getElementById("calMinuteEntry");
+      const calAmPmSelectNd = document.getElementById("calAmPmSelect");
+      
+      ctrl.pendingSelHour = calHourEntryNd.value;
+      ctrl.pendingSelMinute = calHourEntryNd.value;
+      ctrl.pendingSelAmPm = calHourEntryNd.value;
+    } // end of function savePendingSelTime() 
+    
+    
     
     
    /****************************************************************************
