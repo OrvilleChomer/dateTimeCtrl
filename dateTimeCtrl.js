@@ -34,6 +34,10 @@
   Try this test page out on Glitch:    https://respected-indigo.glitch.me/
 
        Generating date control on this page is not automatic just to make my debugging of the control easier!
+       
+       
+  Try out the control with this Pen on CodePen:
+  
  ****************************************************************************************************************/
 
 const gblDateCtrlInfoByFieldName = [];
