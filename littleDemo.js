@@ -1,4 +1,4 @@
-import DateTimeCtrl from 'https://orvillechomer.github.io/dateTimeCtrl/dateTimeCtrl.js'
+import DateTimeCtrl from 'https://orvillechomer.github.io/dateTimeCtrl/dateTimeCtrl.js?v=2'
 
 
 function pageSetup() {
