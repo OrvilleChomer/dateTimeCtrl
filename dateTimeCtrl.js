@@ -353,8 +353,8 @@ const gblDateCtrlState = {};
       let s=[];
       let nTop;
       let nLeft;
-      const nPageWidth = window.innerWidth;
-      const nPageHeight = window.innerHeight;
+      let nPageWidth = window.innerWidth;
+      let nPageHeight = window.innerHeight;
       let sCaption = "Select Date";
       let pickDate = ctrl.pickDate; // where we are pointing and poking around!  :P
       let todaysDate = new Date();
