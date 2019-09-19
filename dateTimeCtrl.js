@@ -26,7 +26,7 @@
      check out the:   README.md     file
      
      
-  Page on my site about this date control: 
+  Page on my web site about this date control: 
   
      http://chomer.com/freeware/javascript-module-date-time-control-info/
   
@@ -37,7 +37,21 @@
        
        
   Try out the control with this Pen on CodePen:
+     ddddd
+     
+  Key functions:
   
+     dtCtrl.newCtrlMarkup        - creates new date control and returns HTML markup for it
+     calSelDate()                - called when user selects a date on the calendar
+     dtCtrl.activateControls     - wires up all the event handling on any date controls added to the DOM
+     dtCtrl.calPrev              - called when [<] button on calendar popup is picked
+     dtCtrl.calendarPopupClicked - called when date control's [...] button is clicked to bring up calendar popup
+     dtCtrl.calNext              - called when [>] button on calendar popup is picked
+     dtCtrl.calSetDateTime       - called when [SET] button is clicked on popup
+     dtCtrl.calToday             - called when [Today] button is clicked on popup
+     buildCalendarPopup()        - Builds HTML markup for calendar popup and adds it to the DOM.
+     formattedDate()             - Takes the input of a Date object and returns a formatted string of date
+     
  ****************************************************************************************************************/
 
 const gblDateCtrlInfoByFieldName = [];
@@ -200,6 +214,7 @@ const gblDateCtrlState = {};
       } // end if
       
       ctrl.pendingSelDatePicked = false;
+      ctrl.pendingSelDate = "";
       ctrl.pickDate = pickDate;
       
       buildCalendarPopup(ctrl);
@@ -348,6 +363,10 @@ const gblDateCtrlState = {};
       
       pickDate is like the navigation date which may or may not match the 
       current date value
+      
+      // width is 414 on iPhone Plus
+      // width is 320 on regular iPhone
+      // width is 1579 on a Mac
     ****************************************************************************/      
     function buildCalendarPopup(ctrl) {
       let s=[];
@@ -359,7 +378,7 @@ const gblDateCtrlState = {};
       let pickDate = ctrl.pickDate; // where we are pointing and poking around!  :P
       let todaysDate = new Date();
       let bFoundSelDate = false;
-      
+      let sCssExt = "";
       
       
       let nYear = pickDate.getFullYear();
@@ -383,18 +402,23 @@ const gblDateCtrlState = {};
         //nPopupHeight = nPopupHeight + Math.floor(nPopupHeight * .1);
       } // end if
       
+      if (nPageWidth <500) {
+        sCssExt = "_s"; // css selector extension for "small" displays
+      } // end if
+      
       if (typeof ctrl.pickDateCaption === "string") {
         sCaption = ctrl.pickDateCaption;
       } // end if
       
       
       // show "custom" caption for the date/time field being edited:
-      s.push("<div class='calCaption' ");
+      s.push("<div class='calCaption"+sCssExt+"' ");
       s.push("style="+Q);
       s.push("width:"+(nPopupWidth-20)+"px;")
       s.push(Q);
       s.push(">");
       s.push(sCaption);
+    //  s.push("width: "+nPageWidth);
       s.push(":</div>"); // calCaption
       
       
@@ -407,12 +431,21 @@ const gblDateCtrlState = {};
       s.push(">");
       s.push("✖</button>"); 
       
-      s.push("<div class='calMonthYear'>");
-      s.push("<span class='calMonthName'>"+sMonthName+"&nbsp;</span>");
-      s.push("<span class='calYear'>"+pickDate.getFullYear()+"</span>");
+      s.push("<div class='calMonthYear' "); // 50 top
+      if (nPageWidth < 400) {
+        s.push("style="+Q+"top:40px;"+Q);
+      } // end if
+      s.push(">");
+      s.push("<span class='calMonthName"+sCssExt+"'>"+sMonthName+"&nbsp;</span>");
+      
+      if (nPageWidth < 400) {
+        s.push("<br>");
+      } // end if
+      
+      s.push("<span class='calYear"+sCssExt+"'>"+pickDate.getFullYear()+"</span>");
       s.push("</div>"); // calMonthYear
 
-      s.push("<button class='calPrevBtn' id='calPopupPrevBtn' ");    
+      s.push("<button class='calPrevBtn"+sCssExt+"' id='calPopupPrevBtn' ");    
       s.push("data-field="+Q+ctrl.field+Q+" ");
       s.push("title='previous month' ");
       s.push(">");
@@ -420,7 +453,7 @@ const gblDateCtrlState = {};
 
 
       // Today button
-      s.push("<button class='calTodayBtn' id='calPopupTodayBtn' ");   
+      s.push("<button class='calTodayBtn"+sCssExt+"' id='calPopupTodayBtn' ");   
       s.push("data-field="+Q+ctrl.field+Q+" ");
       s.push("title='jump to today' ");    
       s.push(">");
@@ -428,7 +461,7 @@ const gblDateCtrlState = {};
 
 
       // next month button
-      s.push("<button class='calNextBtn' id='calPopupNextBtn' ");    
+      s.push("<button class='calNextBtn"+sCssExt+"' id='calPopupNextBtn' ");    
       s.push("data-field="+Q+ctrl.field+Q+" ");
       s.push("title='next month' ");
       s.push(">");
@@ -519,13 +552,15 @@ const gblDateCtrlState = {};
           s.push("width:"+(nBlockSize)+"px;");
           s.push("height:"+(nBlockSize)+"px;");        
           s.push(Q);
-
+          
           if (weekDate>0 && weekDate <= nTotDaysInMonth) {
+            s.push(" ");
             s.push("data-field="+Q+ctrl.field+Q+" ");
             s.push("data-weekday="+Q+n2+Q+" ");
             s.push("data-month="+Q+pickDate.getMonth()+Q+" ");
             s.push("data-date="+Q+(weekDate)+Q+" ");
-            s.push("data-year="+Q+pickDate.getFullYear()+Q+" ");
+            s.push("data-year="+Q+pickDate.getFullYear()+Q+" ");   
+            
           } // end if
           
           
@@ -556,10 +591,18 @@ const gblDateCtrlState = {};
               s.push("class='calOtherDays' ");
             } // end if
 
+            let nDateRight = 6;
+            let nDateTop = 3;
+            
+            if (nPageWidth < 400) {
+              nDateRight = 2;
+              nDateTop = 1;
+            } // end if
+            
             s.push("style="+Q);
             s.push("position:absolute;");
-            s.push("right:6px;");
-            s.push("top:3px;");
+            s.push("right:"+(nDateRight)+"px;");
+            s.push("top:"+(nDateTop)+"px;");
 
             if (!bIsToday) {
               if (n2===0 || n2===6) {
@@ -590,8 +633,8 @@ const gblDateCtrlState = {};
       ****************************************************************************/
       nTop = nTop + 10;    
       
-      if (nTop + 100 > nPageHeight) {
-        nPageHeight = nTop + 100;
+      if (nTop + 100 > nPopupHeight) {
+        nPopupHeight = nTop + 100;
       } // end if
       
       s.push("<div id='calDateTimeBox' ");
@@ -642,7 +685,7 @@ const gblDateCtrlState = {};
         } // end if (ctrl.editTime === true)
       
         // SET button should be there... even if user is not editing the time value!
-        s.push("<button id='calSetDateBtn' ");
+        s.push("<button id='calSetDateBtn' class='calSetDateBtn"+sCssExt+"' ");
         s.push("data-field="+Q+ctrl.field+Q+" ");
         s.push(">SET</button>");
       
@@ -767,8 +810,9 @@ const gblDateCtrlState = {};
   ****************************************************************************/
   function calSelDate(event) {
     
+    // *** UNSELECT ANY PREVIOUS VISIBLE DATE:
     // if there is a calendar date on the current calendar that is selected,
-    // unselect it (via css classes)
+    // Unselect it (via css classes)
     const calSelBlocks = document.getElementsByClassName("calBlockSel");
     let nMax = calSelBlocks.length; // really should only be 0 or 1
     for(let n=0;n<nMax;n++) {
@@ -786,14 +830,23 @@ const gblDateCtrlState = {};
       
     } // next n
     
+    
+    // *** SELECT DATE PICKED BY USER:
     const calDateDspNd = document.getElementById("calDateDsp");
-    const dateBlock = event.target;
-    const dtCtrl = new DateTimeCtrl();
-    const sField = dateBlock.dataset.field;
+    
+    let dateBlock = event.target;    
+
+    if (dateBlock.className === "calToday" || dateBlock.className === "calOtherDays") {
+      dateBlock = dateBlock.parentElement;
+    } // end if
+    
+    const dtCtrl = new DateTimeCtrl();    
+    const sField = dateBlock.dataset.field;    
     const nMonth = dateBlock.dataset.month - 0;
     const nDate = dateBlock.dataset.date - 0;
     const nYear = dateBlock.dataset.year - 0;
     const ctrl = dtCtrl.getCtrl(sField);
+    
     const pendingSelDate = new Date();
     const pickDate = ctrl.pickDate;
     pendingSelDate.setMonth(nMonth);
@@ -812,7 +865,7 @@ const gblDateCtrlState = {};
 
     calDateDspNd.value = formattedDate(pendingSelDate); // show the date picked in a formatted manner
     
-    // once a date has been selected, uhide area where user can put in a time and/or click SET button:
+    // once a date has been selected, unhide area where user can put in a time and/or click SET button:
     const calDateTimeBoxNd = document.getElementById("calDateTimeBox");
     calDateTimeBoxNd.style.display = "block";
         
@@ -954,7 +1007,7 @@ const gblDateCtrlState = {};
       s.push("#calAmPmSelect {");
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
-      s.push("  top:3px;");
+      s.push("  top:8px;");
       s.push(sFont);
       s.push("  left:225px;");
       s.push("  font-size:12pt;");
@@ -975,6 +1028,7 @@ const gblDateCtrlState = {};
       
       s.push(".calBlock1 {");
       s.push("  position:absolute;");
+      s.push("  padding:0;");
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
@@ -984,6 +1038,7 @@ const gblDateCtrlState = {};
 
       s.push(".calBlock2 {");
       s.push("  position:absolute;");
+      s.push("  padding:0;");
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
@@ -1028,6 +1083,7 @@ const gblDateCtrlState = {};
       s.push(".calBlockSel {");
       s.push("  position:absolute;");
       s.push("  overflow:hidden;");
+      s.push("  padding:0;");
       s.push("  box-sizing:border-box;");
       s.push("  border:solid silver .5px;");
       s.push(sFont);
@@ -1044,6 +1100,7 @@ const gblDateCtrlState = {};
       s.push("  cursor:pointer;");
       s.push("}");
 
+      // normal calendar caption:
       s.push(".calCaption {");
       s.push("  position:absolute;");
       s.push("  overflow:hidden;");
@@ -1055,6 +1112,20 @@ const gblDateCtrlState = {};
       s.push("  font-size:24pt;");
       s.push("  color:#0066cc;");
       s.push("}"); 
+      
+      // small calendar caption:
+      s.push(".calCaption_s {");
+      s.push("  position:absolute;");
+      s.push("  overflow:hidden;");
+      s.push("  box-sizing:border-box;");
+      s.push("  left:20px;");
+      s.push("  top:8px;");
+      s.push("  width: 300px;");
+      s.push(sFont);
+      s.push("  font-size:15pt;");
+      s.push("  color:#0066cc;");
+      s.push("}"); 
+      
       
       s.push(".calColonSep {");
       s.push("  position:absolute;");
@@ -1085,7 +1156,7 @@ const gblDateCtrlState = {};
       s.push("  box-sizing:border-box;");
       s.push("  left:20px;");
       s.push("  width: 300px;");
-      s.push("  height:65px;");
+      s.push("  height:85px;");
       s.push("  border:solid white 1px;");
       s.push("  border-radius:5px;");
       s.push("}"); 
@@ -1103,6 +1174,7 @@ const gblDateCtrlState = {};
       s.push("}"); 
       
       
+      // next button normal display...
       s.push(".calNextBtn {"); 
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
@@ -1113,6 +1185,26 @@ const gblDateCtrlState = {};
       s.push("  width:35px;");
       s.push(sFont);
       s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
+      s.push("  border-radius:3px;");
+      s.push("  border:solid gray 1px;");
+      s.push("  cursor:pointer;");
+      s.push("}");  
+      
+      // next button for small display...
+      s.push(".calNextBtn_s {"); 
+      s.push("  position:absolute;");
+      s.push("  box-sizing:border-box;");
+      s.push("  padding-left:0px;");
+      s.push("  padding-right:0px;");
+      s.push("  text-align:center;");
+      s.push("  height:35px;");
+      s.push("  top:45px;");
+      s.push("  right:6px;");
+      s.push("  width:30px;");
+      s.push(sFont);
+      s.push("  font-size:16pt;");
+      s.push("  overflow:hidden;");
       s.push("  background:#f2f2f2;");
       s.push("  border-radius:3px;");
       s.push("  border:solid gray 1px;");
@@ -1136,7 +1228,13 @@ const gblDateCtrlState = {};
       s.push("  font-weight:bold;"); 
       s.push(sFont);
       s.push("  font-size:24pt;"); 
-      s.push("}"); 
+      s.push("}");
+      
+      s.push(".calMonthName_s {"); 
+      s.push("  font-weight:bold;"); 
+      s.push(sFont);
+      s.push("  font-size:15pt;"); 
+      s.push("}");
 
       s.push(".calMonthYear {"); 
       s.push("  position:absolute;"); 
@@ -1169,7 +1267,7 @@ const gblDateCtrlState = {};
       s.push("  border-radius:6px;");
       s.push("}");
 
-      
+      // normal prev button
       s.push(".calPrevBtn {"); 
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
@@ -1187,6 +1285,26 @@ const gblDateCtrlState = {};
       s.push("}");  
       
       
+      // small prev button
+      s.push(".calPrevBtn_s {"); 
+      s.push("  position:absolute;");
+      s.push("  box-sizing:border-box;");
+      s.push("  overflow:hidden;");
+      s.push("  padding-left:0px;");
+      s.push("  padding-right:0px;");
+      s.push("  text-align:center;");
+      s.push("  height:35px;");
+      s.push(sFont);
+      s.push("  top:45px;");
+      s.push("  right:115px;");
+      s.push("  width:30px;");
+      s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
+      s.push("  border-radius:3px;");
+      s.push("  border:solid gray 1px;");
+      s.push("  cursor:pointer;");
+      s.push("}");
+      
       s.push(".calToday {");
       s.push("  background:red;");
       s.push("  width:30px;");
@@ -1201,7 +1319,7 @@ const gblDateCtrlState = {};
 
       
       
-      s.push("#calSetDateBtn {");
+      s.push(".calSetDateBtn {");
       s.push("  position:absolute;");
       s.push("  overflow:hidden;");
       s.push("  box-sizing:border-box;");
@@ -1216,6 +1334,26 @@ const gblDateCtrlState = {};
       s.push("  font-size:16pt;");
       s.push("}"); 
       
+      // SET date button for small screen
+      s.push(".calSetDateBtn_s {");
+      s.push("  position:absolute;");
+      s.push("  overflow:hidden;");
+      s.push("  box-sizing:border-box;");
+      s.push("  top:45px;");
+      s.push("  left:-2px;");
+      s.push("  cursor:pointer;");
+      //s.push("  width: 300px;");
+      s.push("  height:35px;");
+      s.push("  border-radius:3px;");
+      s.push("  border:solid gray 1px;");
+      s.push(sFont);
+      s.push("  font-size:16pt;");
+      s.push("  font-weight:bold;");
+      s.push("}"); 
+      
+      
+      
+      // normal Today button...
       s.push(".calTodayBtn {");
       s.push("  position:absolute;");
       s.push("  box-sizing:border-box;");
@@ -1223,6 +1361,26 @@ const gblDateCtrlState = {};
       s.push("  height:35px;");
       s.push("  top:45px;");
       s.push("  right:85px;");
+      s.push("  width:75px;");
+      s.push(sFont);
+      s.push("  font-size:16pt;");
+      s.push("  background:#f2f2f2;");
+      s.push("  border-radius:3px;");
+      s.push("  border:solid gray 1px;");
+      s.push("  cursor:pointer;");
+      s.push("}");
+      
+      // small Today button...
+      s.push(".calTodayBtn_s {");
+      s.push("  position:absolute;");
+      s.push("  box-sizing:border-box;");
+      s.push("  overflow:hidden;");
+      s.push("  padding-left:0px;");
+      s.push("  padding-right:0px;");
+      s.push("  text-align:center;");
+      s.push("  height:35px;");
+      s.push("  top:45px;");
+      s.push("  right:38px;");
       s.push("  width:75px;");
       s.push(sFont);
       s.push("  font-size:16pt;");
@@ -1285,7 +1443,7 @@ const gblDateCtrlState = {};
       s.push("  left:0px;");
       s.push("  top:0px;");
       s.push("  width:160px;");
-      s.push("  background:lightgreen;");
+      s.push("  background:white;");
       s.push("  height:28px;");
       s.push("  font-size:10pt;");
       s.push(sFont);      
@@ -1471,4 +1629,5 @@ const gblDateCtrlState = {};
     
     
   } // end of function DateTimeCtrl()
+
 
