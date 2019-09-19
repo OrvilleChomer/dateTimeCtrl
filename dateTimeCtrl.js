@@ -264,6 +264,7 @@ const gblDateCtrlState = {};
       if (!ctrl.pendingSelDatePicked && ctrl.dateValue !== "") {
         const selDate = new Date(ctrl.dateValue);
         ctrl.pendingSelDate = selDate;
+        ctrl.pendingSelDatePicked = true;
       } // end if
       
       if (ctrl.pendingSelDatePicked) {
@@ -884,8 +885,13 @@ const gblDateCtrlState = {};
       const kc = event.keyCode;
       const BACKSPACE = 8; // don't have to worry about the Tab key!
       
-      const sChar = String.fromCharCode(kc);
+      let sChar = String.fromCharCode(kc);
       const sValidChars = "0123456789";
+      
+      // handle numbers entered from numeric keypad on keyboard:
+      if (kc > 95 && kc < 106) {
+        sChar = (kc - 96)+"";
+      } // end if
       
       if (sValidChars.indexOf(sChar) === -1 && kc !== BACKSPACE) {
         // not a correct character... don't allow it to be accepted as part of the input!
