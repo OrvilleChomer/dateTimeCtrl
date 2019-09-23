@@ -1,6 +1,7 @@
 /*****************************************************************************************************************
 
   dateTimeCtrl.js
+  version 1.0.2
   
   eventually, give option to pick another month/year when date value is 
   blank other than the Current month/year as a starting point on the calendar.
