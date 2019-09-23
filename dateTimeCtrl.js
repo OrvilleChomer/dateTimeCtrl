@@ -66,7 +66,7 @@ const gblDateCtrlState = {};
     console.log("DateTimeCtrl constructor called");
     const dtCtrl = this;
     const Q = '"';
-    const dateTimeCtrlVersion = "1.0";
+    const dateTimeCtrlVersion = "1.0.2";
     
     dtCtrl.ctrlVersion = dateTimeCtrlVersion;
     
@@ -156,6 +156,12 @@ const gblDateCtrlState = {};
         ctrl.hiddenInput = hiddenNd;
         ctrl.dateTimeInput = dateTimeNd;
         ctrl.dateTimeButton = dateTimeButtonNd;
+        
+        if (ctrl.dateValue !== "") {
+          hiddenNd.value = ctrl.dateValue;
+          dateTimeNd.value = formattedDateTime(ctrl);
+          ctrl.hasValue = true;
+        } // end if
         
       } // next n
       
