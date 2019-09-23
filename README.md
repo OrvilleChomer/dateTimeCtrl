@@ -1,5 +1,5 @@
 # dateTimeCtrl Project - JavaScript Module
-Date Time GUI Control for web pages
+Date Time GUI Control for web pages (as a JS Module)
 
 Committed under gh-pages branch so we can use Github like a CDN.
 
